@@ -102,8 +102,25 @@ class ChatScreen extends StatelessWidget {
         body: Column(
           children: <Widget>[
             Expanded(
-              child: ListView(
-                children: <Widget>[ChatMessage(), ChatMessage(), ChatMessage()],
+              child: StreamBuilder(
+                  stream: Firestore.instance.collection('mensagens').snapshots(),
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState){
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      default:
+                        return ListView.builder(
+                            reverse: true,
+                            itemCount: snapshot.data.documents.length,
+                            itemBuilder: (context, index) {
+                              return ChatMessage();
+                            }
+                        );
+                    }
+                  }
               ),
             ),
             Divider(
@@ -182,6 +199,11 @@ class _TextComposerState extends State<TextComposer> {
 }
 
 class ChatMessage extends StatelessWidget {
+
+  final Map<String, dynamic> data;
+  ChatMessage(this.data);
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -191,8 +213,7 @@ class ChatMessage extends StatelessWidget {
           Container(
             margin: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
-              backgroundImage: NetworkImage(
-                  'https://cdn4.iconfinder.com/data/icons/dogs-6/300/06-512.png'),
+              backgroundImage: NetworkImage(data['senderPhotoUrl']),
             ),
           ),
           Expanded(
@@ -200,12 +221,13 @@ class ChatMessage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Rafael',
+                  data['senderName'],
                   style: Theme.of(context).textTheme.subhead,
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 5.0),
-                  child: Text('teste'),
+                  child: data['imgUrl'] != null? 
+                  Image.network(data['imgUrl'], width: 250.00,): Text(data['text'])
                 )
               ],
             ),
