@@ -73,7 +73,6 @@ void _sendMessage ({String text, String imgUrl}){
 
 
 
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -119,7 +118,7 @@ class ChatScreen extends StatelessWidget {
                             itemCount: snapshot.data.documents.length,
                             itemBuilder: (context, index) {
                               List r = snapshot.data.documents.reversed.toList();
-                              return ChatMessage(r [index].data);
+                              return ChatMessage( r [index].data);
                             }
                         );
                     }
@@ -230,7 +229,7 @@ class ChatMessage extends StatelessWidget {
           Container(
             margin: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
-              backgroundImage: NetworkImage(data['senderPhotoUrl']),
+              backgroundImage: NetworkImage('https://image.shutterstock.com/image-vector/dog-icon-450w-311365823.jpg'),
             ),
           ),
           Expanded(
@@ -244,8 +243,8 @@ class ChatMessage extends StatelessWidget {
                 Container(
                   margin: const EdgeInsets.only(top: 5.0),
                   child: data['imgUrl'] != null?
-                  Image.network(data ['imgUrl'], width: 150.00,) :
-                   Text(data ['text'])
+                  Image.network(data ['imgUrl'], width: 250.00,) :
+                  Text(data ['text'])
                 )
               ],
             ),
