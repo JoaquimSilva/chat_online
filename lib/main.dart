@@ -1,5 +1,7 @@
+import "dart:math";
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/image.dart'; // ignore: implementation_imports
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -116,7 +118,8 @@ class ChatScreen extends StatelessWidget {
                             reverse: true,
                             itemCount: snapshot.data.documents.length,
                             itemBuilder: (context, index) {
-                              return ChatMessage();
+                              List r = snapshot.data.documents.reversed.toList();
+                              return ChatMessage(r [index].data);
                             }
                         );
                     }
@@ -147,6 +150,12 @@ class TextComposer extends StatefulWidget {
 class _TextComposerState extends State<TextComposer> {
   final _textController = TextEditingController();
   bool _isComposing = false;
+  void _reset(){
+    _textController.clear();
+    setState(() {
+      _isComposing = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,6 +186,7 @@ class _TextComposerState extends State<TextComposer> {
                 },
                 onSubmitted: (text){
                   _handleSubmitted(text);
+                  _reset();
                 },
               ),
             ),
@@ -185,11 +195,15 @@ class _TextComposerState extends State<TextComposer> {
                 child: Theme.of(context).platform == TargetPlatform.iOS
                     ? CupertinoButton(
                   child: Text('Enviar'),
-                  onPressed: _isComposing ? () { _handleSubmitted(_textController.text);} : null,
+                  onPressed: _isComposing ? () { _handleSubmitted(_textController.text);
+                  _reset();
+                  }: null,
                 )
                     : IconButton(
                   icon: Icon(Icons.send),
-                  onPressed: _isComposing ? () { _handleSubmitted(_textController.text);} : null,
+                  onPressed: _isComposing ? () { _handleSubmitted(_textController.text);
+                  _reset();
+                  } : null,
                 ))
           ],
         ),
@@ -200,8 +214,11 @@ class _TextComposerState extends State<TextComposer> {
 
 class ChatMessage extends StatelessWidget {
 
+  //final ImageProvider backgroundImage;
+
   final Map<String, dynamic> data;
   ChatMessage(this.data);
+
 
 
   @override
@@ -226,8 +243,9 @@ class ChatMessage extends StatelessWidget {
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 5.0),
-                  child: data['imgUrl'] != null? 
-                  Image.network(data['imgUrl'], width: 250.00,): Text(data['text'])
+                  child: data['imgUrl'] != null?
+                  Image.network(data ['imgUrl'], width: 150.00,) :
+                   Text(data ['text'])
                 )
               ],
             ),
