@@ -187,7 +187,7 @@ class _TextComposerState extends State<TextComposer> {
                   child(googleSignIn.currentUser.id.toString() + DateTime.now().millisecondsSinceEpoch.toString()).putFile(imgFile);
                   _sendMessage(imgUrl: (await task.future).downloadUrl.toString());
 
-                  //
+
                   }),
             ),
             Expanded(
