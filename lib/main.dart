@@ -1,10 +1,13 @@
-import "dart:math";
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/image.dart'; // ignore: implementation_imports
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+
 
 void main() async {
   //Firestore.instance.collection('mensagens').document('msg5').setData({'from':'joaquim', 'texto':'teste2'});
@@ -52,6 +55,10 @@ Future <Null>  _ensureLoggedIn() async {
         accessToken: credentials.accessToken);
   }
 }
+
+
+
+
 
 _handleSubmitted(String text) async {
   await _ensureLoggedIn();
@@ -171,7 +178,15 @@ class _TextComposerState extends State<TextComposer> {
           children: <Widget>[
             Container(
               child:
-              IconButton(icon: Icon(Icons.photo_camera), onPressed: () {}),
+              IconButton(icon: Icon(Icons.photo_camera),
+                  onPressed: () async {
+                  await _ensureLoggedIn();
+                  File imgFile = await ImagePicker.pickImage(source: ImageSource.camera);
+                  if (imgFile == null) return;
+                  StorageUploadTask task = FirebaseStorage.instance.ref().
+                  child(googleSignIn.currentUser.id.toString() + DateTime.now().millisecondsSinceEpoch.toString()).putFile(imgFile);
+                  _sendMessage(imgUrl: (await task.future).downloadUrl.toString());
+                  }),
             ),
             Expanded(
               child: TextField(
@@ -245,6 +260,7 @@ class ChatMessage extends StatelessWidget {
                   child: data['imgUrl'] != null?
                   Image.network(data ['imgUrl'], width: 250.00,) :
                   Text(data ['text'])
+
                 )
               ],
             ),
